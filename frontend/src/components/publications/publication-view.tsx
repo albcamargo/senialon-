@@ -1,4 +1,6 @@
+import Link from "next/link";
 import type { Schema } from "@/lib/api/types";
+import { analysisPath } from "@/lib/analysis/presentation";
 import { sourceLabel } from "@/lib/runs/corpus";
 import { dateLabel, stageLabels } from "@/lib/runs/presentation";
 import {
@@ -236,6 +238,14 @@ export function SavedSelectionView({ result }: { result: SelectionResult }) {
     <div className={styles.selection} aria-labelledby="saved-selection-title">
       <h3 id="saved-selection-title">Selección guardada</h3>
       <p>{selection.publication.title ?? selection.publication.video_id}</p>
+      <div className={styles.links}>
+        <Link
+          href={analysisPath(selection.run_id, selection.analysis_id)}
+          prefetch={false}
+        >
+          Abrir ficha de la publicación seleccionada
+        </Link>
+      </div>
       <p className={shared.secondary}>
         Análisis audiovisual: {stageLabels[selection.audiovisual.state]}.
         {selection.audiovisual.reason ? ` ${selection.audiovisual.reason}` : ""}

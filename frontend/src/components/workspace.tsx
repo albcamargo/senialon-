@@ -4,18 +4,35 @@ import { Icon } from "./icon";
 import logo from "../../public/branding/senialon-dark.png";
 import styles from "./workspace.module.css";
 
-function Navigation() {
+function Navigation({
+  runId,
+  section = "runs",
+}: {
+  runId?: string;
+  section?: "runs" | "publications";
+}) {
+  const root = runId ? `/?run=${encodeURIComponent(runId)}` : "/";
+  const anchorRoot = runId ? root : "";
   return (
     <nav className={styles.navigation} aria-label="Navegación principal">
-      <Link className={styles.activeLink} href="/" aria-current="page">
+      <Link
+        className={section === "runs" ? styles.activeLink : undefined}
+        href={root}
+        aria-current={section === "runs" ? "page" : undefined}
+        prefetch={false}
+      >
         <Icon name="runs" />
         Ejecuciones
       </Link>
-      <a href="#comparacion">
+      <a href={`${anchorRoot}#comparacion`}>
         <Icon name="comparison" />
         Comparación temática
       </a>
-      <a href="#publicaciones">
+      <a
+        href={`${anchorRoot}#publicaciones`}
+        className={section === "publications" ? styles.activeLink : undefined}
+        aria-current={section === "publications" ? "page" : undefined}
+      >
         <Icon name="publications" />
         Publicaciones
       </a>
@@ -28,14 +45,20 @@ function Navigation() {
 
 export function Workspace({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+  runId,
+  section,
+}: Readonly<{
+  children: React.ReactNode;
+  runId?: string;
+  section?: "runs" | "publications";
+}>) {
   return (
     <div className={styles.workspace}>
       <aside className={styles.sidebar}>
         <Link className={styles.brand} href="/" aria-label="SENIALON, inicio">
           <Image src={logo} alt="SENIALON" width={184} height={80} priority />
         </Link>
-        <Navigation />
+        <Navigation runId={runId} section={section} />
         <div className={styles.sidebarFooter}>
           <span>Radar de contenidos</span>
           <strong>YouTube · IA</strong>
@@ -60,7 +83,7 @@ export function Workspace({
             <span>Menú</span>
             <Icon className={styles.menuChevron} name="chevron" />
           </summary>
-          <Navigation />
+          <Navigation runId={runId} section={section} />
         </details>
         <main id="contenido" className={styles.main} tabIndex={-1}>
           {children}

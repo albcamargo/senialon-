@@ -33,6 +33,15 @@ export function dateLabel(value: string): string {
   return dateFormatter.format(new Date(value));
 }
 export function phaseLabel(value: string): string {
+  const analysis: Record<string, string> = {
+    audiovisual: "Análisis audiovisual",
+    value: "Valor para la audiencia",
+    persona: "Afinidad de persona",
+    company_context: "Contexto empresarial",
+    pillar: "Pilar editorial",
+    synthesis: "Síntesis y adaptación",
+  };
+  if (Object.hasOwn(analysis, value)) return analysis[value];
   return Object.hasOwn(phaseLabels, value)
     ? phaseLabels[value as keyof typeof phaseLabels]
     : value;

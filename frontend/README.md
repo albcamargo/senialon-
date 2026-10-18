@@ -10,6 +10,8 @@ FE 1.6 incorpora [comparación temática y respaldo por canal](COMPARACION.md), 
 
 FE 1.7 incorpora [catálogo, inspección y selección de publicaciones elegibles](PUBLICACIONES.md), independientes de grupos y comparación. La selección guarda una identidad mediante BE sin solicitar análisis profundo; se recupera por GET tras perder una respuesta. Verificación local: 480 Vitest (49 nuevas), 13 Playwright nuevos exclusivos de FE 1.7 y build aprobados. La persistencia con servicios reales y el recorrido desplegado conservan su comprobación pendiente.
 
+FE 1.8 incorpora la [ficha de publicación y evidencia](FICHA.md): métricas, señal conservada, observaciones temporales, valor, afinidad, hipótesis y adaptación en bloques independientes. Incluye URL recuperable y versiones de lectura, revisión visible y avance explícito de una unidad con recuperación por GET. Verificación local: **534 Vitest (54 nuevas), 14 Playwright nuevos exclusivos de FE 1.8 y build aprobados**; 17 artefactos cliente sin marcadores privados. Las pruebas usan únicamente datos sintéticos; el recorrido con proveedores, persistencia y despliegue reales sigue pendiente. El formulario de decisión pertenece a FE 1.9.
+
 ## Requisitos y arranque
 
 - Node.js `>=24.21.0 <25`; `.nvmrc` fija `24.21.0`.

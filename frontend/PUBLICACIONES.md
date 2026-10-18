@@ -68,4 +68,4 @@ El contrato OpenAPI **1.0.0** conserva SHA-256 `d7e0b018263658e686da00997ddffbd1
 
 ## Alcance pendiente
 
-FE 1.8 y FE 1.9 no están implementadas por esta entrega. FE 1.7 conserva abierta su casilla de cierre integrado: faltan BE 3.8–3.11, ALG 2.3 y el recorrido desplegado con corpus, pertinencia y persistencia auténticos. La evidencia sintética no sustituye esas verificaciones.
+La entrega original de FE 1.7 no incluía la ficha ni el formulario editorial. La autorización posterior de FE 1.8 incorpora el enlace **Abrir ficha de la publicación seleccionada** y la [ficha con evidencia y versiones](FICHA.md); FE 1.9 sigue pendiente. FE 1.7 conserva abierta su casilla de cierre integrado: faltan las comprobaciones de BE 3.8–3.11, ALG 2.3 y el recorrido desplegado con corpus, pertinencia y persistencia auténticos. La evidencia sintética no sustituye esas verificaciones.
