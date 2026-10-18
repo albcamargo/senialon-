@@ -2,7 +2,12 @@
 
 ![Logo de SENIALON](branding/Fluido%20%C2%B7%20claro%402x.png)
 
-Detectamos la señal cuando apenas se enciende.
+📡Detectamos la señal cuando apenas se enciende.
+
+## Acceso 
+USERNAME: senialon
+PASSWORD: pass_senialon
+URL: https://corefex-psi.vercel.app
 
 ## Identidad visual
 
