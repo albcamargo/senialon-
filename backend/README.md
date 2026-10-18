@@ -23,6 +23,22 @@ uv run --locked --env-file .env uvicorn main:app --host 127.0.0.1 --port 8000 --
 
 La migración inicial crea tablas `senialon_v1_*` y la fila de reservas si faltan. No borra resultados ni reinicia reservas existentes; no convierte tablas de prototipos ni constituye un sistema de upgrades. Solo se ejecuta explícitamente. PostgreSQL remoto usa TLS, pool pequeño y prepared statements desactivados; no hay almacenamiento duradero en memoria o archivos.
 
+### Supabase del equipo
+
+El 18 de octubre de 2026 se preparó el proyecto `yzcauzdirrirnogzrhwp` desde su panel. Se ejecutó en SQL Editor el DDL derivado de los modelos actuales, con creación aditiva de siete tablas y cinco índices e inserción del presupuesto solo si faltaba. La consulta posterior confirmó las siete tablas con RLS activa y propietario `postgres`, y la fila `demo` con reserva cero. Data API quedó desactivada: el producto accede mediante PostgreSQL desde Python. La [evidencia de preparación](../frontend/verification/supabase-setup.json) no acredita todavía la conexión de Vercel.
+
+Los archivos privados `backend/.env` y `backend/.env.migrate` están excluidos de Git. Se prepararon con las URIs que muestra Connect del proyecto, conservando el marcador `[YOUR-PASSWORD]` hasta que el operador lo sustituya. Usar Transaction pooler, puerto **6543**, para `DATABASE_URL` de la aplicación, y Session pooler, puerto **5432**, para la migración. Codificar en la URI los caracteres reservados de la contraseña; no compartir la conexión por chat ni guardarla en variables `NEXT_PUBLIC_*`. No se necesitan claves de la Data API.
+
+Con la conexión privada completa, desde `backend/` se puede ejecutar de nuevo la migración existente, que conserva las tablas y reservas:
+
+```sh
+env -u DATABASE_URL uv run --locked python migrate.py --env-file .env.migrate
+```
+
+El estado de Vercel asociado a `main` (`0c0ea19`) en GitHub apunta a [este despliegue de acamargo-4070s-projects/senialon](https://vercel.com/acamargo-4070s-projects/senialon/GEAnnJ1zCU42UpoD8MjvHJaegazk). La sesión de `anfecelis` muestra «Not Found» al abrirlo. Su proyecto local `senialon` corresponde a otro destino. Abrir el proyecto enlazado con una cuenta que ya tenga acceso y confirmar allí el dominio de la demo antes de modificar variables.
+
+Pendiente: configurar el `DATABASE_URL` transaccional para el backend del despliegue correcto, entorno Production, y volver a desplegar la versión publicada de `main`. La URL de demo reportada sigue siendo **corefex-psi.vercel.app**; la relación de ese alias con el proyecto enlazado por GitHub aún no se ha comprobado en Domains. Conservar el binding `SENIALON_BACKEND_URL` y `PAID_CALLS_ENABLED=false`; no subir el árbol local con cambios pendientes para aplicar una variable. Después verificar la lectura autenticada de `/api/v1/runs` y la persistencia del recorrido real. La migración por sí sola no cierra FE 1.10.
+
 ## Configuración
 
 | Variable                                                                     | Uso                                                                                                                                               |

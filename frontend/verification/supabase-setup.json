@@ -1,0 +1,56 @@
+{
+  "observed_on": "2026-10-18",
+  "timezone": "America/Bogota",
+  "project_ref": "yzcauzdirrirnogzrhwp",
+  "region": "us-east-2",
+  "source": "Supabase dashboard and SQL Editor",
+  "data_api_enabled": false,
+  "schema": {
+    "applied": true,
+    "method": "Additive DDL compiled from backend/senialon_api/db.py; SQL Editor Run and enable RLS",
+    "python_migrate_command_executed_against_supabase": false,
+    "table_count": 7,
+    "index_definitions_in_applied_sql": 5,
+    "owner": "postgres",
+    "rls_verified_for_all_tables": true,
+    "tables": [
+      "senialon_v1_budget",
+      "senialon_v1_deliveries",
+      "senialon_v1_operations",
+      "senialon_v1_provider_calls",
+      "senialon_v1_recordings",
+      "senialon_v1_runs",
+      "senialon_v1_steps"
+    ],
+    "budget_row": {
+      "id": "demo",
+      "reserved_usd": "0.000000"
+    }
+  },
+  "private_configuration": {
+    "runtime_file": "backend/.env",
+    "migration_file": "backend/.env.migrate",
+    "files_ignored_by_git": true,
+    "connection_metadata_verified_in_dashboard": true,
+    "runtime_port": 6543,
+    "migration_port": 5432,
+    "password_placeholders_remaining_at_last_check": true,
+    "connection_from_local_backend_verified": false
+  },
+  "vercel": {
+    "intended_alias": "corefex-psi.vercel.app",
+    "github_main_sha": "0c0ea19e4a49fd3d33abdca436e2577ddfb4c0da",
+    "github_main_vercel_status_url": "https://vercel.com/acamargo-4070s-projects/senialon/GEAnnJ1zCU42UpoD8MjvHJaegazk",
+    "github_main_deployment_url": "https://senialon-q66z3d6q7-acamargo-4070s-projects.vercel.app",
+    "intended_alias_mapping_verified": false,
+    "available_account": "anfecelis",
+    "available_scope": "anfecelis-projects",
+    "dashboard_result_for_current_account": "Not Found",
+    "intended_project_access_verified": false,
+    "database_url_set_by_this_work": false,
+    "redeployed_by_this_work": false,
+    "post_setup_runs_read_verified": false
+  },
+  "paid_provider_calls_started": false,
+  "fe_1_10_complete": false
+}

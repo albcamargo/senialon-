@@ -92,4 +92,4 @@ Esa prueba no conecta la interfaz Next con la API Python real y no acredita pers
 
 FE 1.9 mantiene pendiente su cierre integrado: falta verificar la interfaz conectada a la API Python en el despliegue, la recuperación con la persistencia del equipo y el acceso a la URL protegida. La comprobación sintética del navegador y la prueba separada del backend sustentan partes distintas de ese recorrido.
 
-FE 1.10 corresponde a la siguiente implementación. La integración opcional con Notion conserva la última prioridad y no forma parte de este cambio.
+La verificación posterior [FE 1.10](INTEGRACION.md) une la interfaz con la API Python real y PostgreSQL temporal, incluido un reinicio del proceso Python y recuperación desde otro contexto de navegador. Usa proveedores interceptados; mantiene pendiente la comprobación desplegada y de la persistencia del equipo. La integración opcional con Notion conserva la última prioridad.

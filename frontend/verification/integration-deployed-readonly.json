@@ -1,0 +1,47 @@
+{
+  "recorded_at": "2026-10-18T16:36:48Z",
+  "base_url": "https://corefex-psi.vercel.app",
+  "scope": "Solo lecturas HTTPS; sin mutaciones ni proveedores",
+  "credential_source": "Acceso de demo del README remoto; valores no registrados",
+  "deployed_commit": "No inspeccionado",
+  "checks": [
+    {
+      "method": "GET",
+      "path": "/",
+      "authenticated": false,
+      "status": 401
+    },
+    {
+      "method": "GET",
+      "path": "/",
+      "authenticated": true,
+      "status": 200,
+      "cache_control": "private, no-cache, no-store, max-age=0, must-revalidate",
+      "contract_version": "1.0.0"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/meta",
+      "authenticated": true,
+      "status": 200,
+      "cache_control": "private, no-store",
+      "contract_version": "1.0.0"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/runs",
+      "authenticated": true,
+      "status": 500,
+      "cache_control": "private, no-store",
+      "contract_version": "1.0.0",
+      "error_code": "INTERNAL_ERROR"
+    }
+  ],
+  "result": "Acceso y metadatos aprobados; recorrido de datos bloqueado",
+  "not_verified": [
+    "Causa exacta del error 500",
+    "Persistencia desplegada y migración",
+    "Proveedores, saldos y costos reales",
+    "Mutaciones de producción y recuperación desde otro equipo físico"
+  ]
+}
