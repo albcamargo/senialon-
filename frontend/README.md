@@ -8,6 +8,8 @@ FE 1.5 prepara [inspección y confirmación de grupos](GRUPOS.md), con versión/
 
 FE 1.6 incorpora [comparación temática y respaldo por canal](COMPARACION.md), con conteos recibidos, cobertura parcial explícita y cálculo separado de las consultas. Se verificaron 431 pruebas unitarias y 8 pruebas nuevas de navegador exclusivas de comparación. El cierre integrado conserva pendiente el recorrido con servicios reales.
 
+FE 1.7 incorpora [catálogo, inspección y selección de publicaciones elegibles](PUBLICACIONES.md), independientes de grupos y comparación. La selección guarda una identidad mediante BE sin solicitar análisis profundo; se recupera por GET tras perder una respuesta. Verificación local: 480 Vitest (49 nuevas), 13 Playwright nuevos exclusivos de FE 1.7 y build aprobados. La persistencia con servicios reales y el recorrido desplegado conservan su comprobación pendiente.
+
 ## Requisitos y arranque
 
 - Node.js `>=24.21.0 <25`; `.nvmrc` fija `24.21.0`.

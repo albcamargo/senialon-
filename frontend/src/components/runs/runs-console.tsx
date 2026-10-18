@@ -20,6 +20,7 @@ import {
 import { changedReceipt, useReceipt } from "@/lib/runs/use-receipt";
 import { GroupPanel } from "@/components/groups/group-panel";
 import { ComparisonPanel } from "@/components/comparison/comparison-panel";
+import { PublicationsPanel } from "@/components/publications/publications-panel";
 import { expectedCorpus, sourceLabel } from "@/lib/runs/corpus";
 import {
   canAdvance,
@@ -469,6 +470,14 @@ export function RunsConsole({
               await refreshRun();
             }}
           />
+          <PublicationsPanel
+            run={run}
+            disabled={!!busy || stale || navigating}
+            refreshContext={async () => {
+              setStale(true);
+              await refreshRun();
+            }}
+          />
           <section className={styles.advance} aria-labelledby="advance-title">
             <div>
               <h2 id="advance-title">Continuar desde el último paso</h2>
@@ -606,6 +615,20 @@ export function RunsConsole({
         </>
       ) : null}
 
+      {!run ? (
+        <section
+          id="publicaciones"
+          className={styles.context}
+          aria-labelledby="publications-empty-title"
+        >
+          <h2 id="publications-empty-title">Publicaciones elegibles</h2>
+          <p className={styles.secondary}>
+            Selecciona una ejecución guardada para consultar sus publicaciones.
+            El catálogo no requiere grupos confirmados ni comparación temática
+            disponible.
+          </p>
+        </section>
+      ) : null}
       {!run ? (
         <section
           id="comparacion"

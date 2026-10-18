@@ -38,6 +38,7 @@ Los logos actuales están en `branding/`. Las variantes disponibles son:
 - [Interfaz de ejecuciones, cobertura y recuperación — avance FE 1.4](frontend/EJECUCIONES.md).
 - [Inspección y confirmación de grupos — avance FE 1.5 y pendientes](frontend/GRUPOS.md).
 - [Comparación temática, respaldo por canal y recuperación — avance FE 1.6](frontend/COMPARACION.md).
+- [Catálogo y selección de publicaciones elegibles — avance FE 1.7](frontend/PUBLICACIONES.md).
 
 ## OpenSpec
 

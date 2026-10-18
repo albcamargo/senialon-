@@ -17,6 +17,11 @@ type RunOperation = Extract<
   | "getGroups"
   | "confirmGroups"
   | "getComparison"
+  | "listEligibleVideos"
+  | "getVideo"
+  | "listAnalyses"
+  | "getAnalysis"
+  | "selectAnalysis"
 >;
 type SuccessBody = {
   listRuns: Schema<"RunsResponse">;
@@ -28,6 +33,11 @@ type SuccessBody = {
   getGroups: Schema<"GroupsResponse">;
   confirmGroups: Schema<"GroupsResponse">;
   getComparison: Schema<"ComparisonResponse">;
+  listEligibleVideos: Schema<"PublicationsResponse">;
+  getVideo: Schema<"PublicationResponse">;
+  listAnalyses: Schema<"AnalysesResponse">;
+  getAnalysis: Schema<"AnalysisResponse">;
+  selectAnalysis: Schema<"AnalysisResponse">;
 };
 
 export function resourceSegment(id: string): string {
@@ -108,11 +118,11 @@ export async function runRequest<Op extends RunOperation>(
     }
     // The value crossed the canonical validator above, not a raw JSON cast.
     const value = result.body as SuccessBody[Op];
-    if ("items" in value) {
-      value.items.forEach(checkCorpus);
+    if (operation === "listRuns") {
+      const runs = value as Schema<"RunsResponse">;
+      runs.items.forEach(checkCorpus);
       if (
-        new Set(value.items.map((run) => run.run_id)).size !==
-        value.items.length
+        new Set(runs.items.map((run) => run.run_id)).size !== runs.items.length
       )
         throw new Error("Identidad repetida en el listado.");
     }

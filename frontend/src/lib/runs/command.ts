@@ -8,6 +8,12 @@ export type CommandReceipt = {
   | { kind: "create" }
   | { kind: "advance"; runId: string; revision: number }
   | {
+      kind: "select_analysis";
+      runId: string;
+      revision: number;
+      videoId: string;
+    }
+  | {
       kind: "confirm_groups";
       runId: string;
       revision: number;
@@ -59,6 +65,7 @@ export function parseReceipt(text: string | null): CommandReceipt | null {
     return { ...base, kind: "create" };
   if (
     (value.kind === "advance" ||
+      value.kind === "select_analysis" ||
       value.kind === "confirm_groups" ||
       value.kind === "compare") &&
     "runId" in value &&
@@ -70,6 +77,21 @@ export function parseReceipt(text: string | null): CommandReceipt | null {
     Number.isSafeInteger(value.revision) &&
     value.revision > 0
   ) {
+    if (
+      value.kind === "select_analysis" &&
+      Object.keys(value).length === 8 &&
+      value.operationId === null &&
+      "videoId" in value &&
+      typeof value.videoId === "string" &&
+      /^[A-Za-z0-9_-]{11}$/.test(value.videoId)
+    )
+      return {
+        ...base,
+        kind: "select_analysis",
+        runId: value.runId,
+        revision: value.revision,
+        videoId: value.videoId,
+      };
     if (value.kind === "advance" && Object.keys(value).length === 7)
       return {
         ...base,

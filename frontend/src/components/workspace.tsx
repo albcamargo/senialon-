@@ -15,12 +15,12 @@ function Navigation() {
         <Icon name="comparison" />
         Comparación temática
       </a>
-      <span className={styles.unavailableLink} aria-disabled="true">
+      <a href="#publicaciones">
         <Icon name="publications" />
         Publicaciones
-      </span>
+      </a>
       <p className={styles.navHint}>
-        La comparación conserva el contexto de la ejecución seleccionada.
+        Comparación y publicaciones conservan la ejecución seleccionada.
       </p>
     </nav>
   );

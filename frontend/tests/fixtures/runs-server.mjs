@@ -23,6 +23,66 @@ let operation = null;
 let requests = [];
 let groupProposal = null;
 let comparison = null;
+let publicationItems = [];
+let selectedAnalyses = [];
+
+function makePublication(videoId, title, confirmed = false) {
+  const value = example("PublicVideo180").data;
+  value.video_id = videoId;
+  value.capture_id = "synthetic-capture-" + videoId;
+  value.url = "https://www.youtube.com/watch?v=" + videoId;
+  value.title = title;
+  value.description =
+    "Escenario sintético de prueba de FE 1.7; no son publicaciones recolectadas por SENIALON.";
+  value.main_topic_id = null;
+  value.evidence.forEach((item) => {
+    item.video_id = videoId;
+    item.evidence_id = "synthetic-text-" + videoId;
+    item.source_url = value.url;
+  });
+  value.ai_relevance.evidence_ids = value.evidence.map(
+    (item) => item.evidence_id,
+  );
+  if (confirmed) {
+    value.short_status = "confirmed_short";
+    value.short_evidence =
+      "SINTÉTICO: respaldo de confirmación del Short, exclusivo de prueba.";
+    value.statistics.views = {
+      state: "known",
+      value: "9007199254740993",
+      reason: null,
+    };
+  }
+  return value;
+}
+
+function makeSelection(publication) {
+  const value = example("SelectedAnalysis");
+  const data = value.data;
+  data.analysis_id = "synthetic-analysis-" + publication.video_id;
+  data.publication = structuredClone(publication);
+  data.performance.capture_id = publication.capture_id;
+  data.evidence = structuredClone(publication.evidence);
+  data.review.analysis_id = data.analysis_id;
+  data.review.evidence_reviews = data.evidence.map((item) => ({
+    evidence_id: item.evidence_id,
+    state: "pending_review",
+    note: null,
+  }));
+  if (scenario === "publications-no-growth") {
+    const signal = example("Signal_2_0");
+    data.groups_id = signal.groups_id;
+    data.groups_version = signal.groups_version;
+    data.publication.main_topic_id = signal.topic_id;
+    data.signal = {
+      state: "available",
+      topic_id: signal.topic_id,
+      comparison_revision: 9,
+      signal,
+    };
+  }
+  return value;
+}
 
 function comparisonState() {
   const value = example(
@@ -102,6 +162,13 @@ function run(runId = "fixture-run-001") {
     });
     if (operation?.state === "succeeded")
       value.last_checkpoint = operation.last_checkpoint;
+  }
+  if (scenario.startsWith("publications-")) {
+    value.current_stage =
+      scenario === "publications-no-growth" ? "idle" : "awaiting_confirmation";
+    value.allowed_actions = ["select_analysis"];
+    value.workflow.reason =
+      "Escenario sintético FE 1.7: selección independiente de grupos y comparación.";
   }
   if (operation && operation.state !== "succeeded") {
     value.allowed_actions = [];
@@ -183,6 +250,26 @@ const server = createServer(async (request, response) => {
           ).data.proposal
         : null;
       comparison = null;
+      publicationItems = [];
+      selectedAnalyses = [];
+      if (scenario.startsWith("publications-")) {
+        publicationItems =
+          scenario === "publications-empty"
+            ? []
+            : [
+                makePublication(
+                  "demoB000001",
+                  "SINTÉTICO · Aplicación de IA para equipos",
+                ),
+                makePublication(
+                  "demoC000001",
+                  "SINTÉTICO · Automatización con IA",
+                  true,
+                ),
+              ];
+        if (scenario === "publications-lost-paged")
+          selectedAnalyses = [makeSelection(publicationItems[1])];
+      }
       if (scenario.startsWith("comparison-")) {
         groupProposal = example(
           scenario === "comparison-unconfirmed"
@@ -231,6 +318,8 @@ const server = createServer(async (request, response) => {
       (failReads === "all" ||
         (failReads === "groups" && url.pathname.endsWith("/groups")) ||
         (failReads === "comparison" && url.pathname.endsWith("/comparison")) ||
+        (failReads === "publications" && url.pathname.endsWith("/videos")) ||
+        (failReads === "selections" && url.pathname.endsWith("/analyses")) ||
         (failReads === "coverage" && url.pathname.endsWith("/coverage")))
     ) {
       send(request, response, 500, example("Error_INTERNAL_ERROR"));
@@ -273,6 +362,135 @@ const server = createServer(async (request, response) => {
       if (segments.length === 5 && request.method === "GET") {
         send(request, response, 200, { data: run(runId) });
         return;
+      }
+      if (
+        scenario.startsWith("publications-") &&
+        ["videos", "analyses"].includes(segments[5])
+      ) {
+        const secondPage = url.searchParams.has("cursor");
+        if (segments[5] === "videos" && request.method === "GET") {
+          if (segments.length === 7) {
+            const publication = publicationItems.find(
+              (item) => item.video_id === segments[6],
+            );
+            if (!publication) {
+              send(request, response, 404, example("Error_NOT_FOUND"));
+              return;
+            }
+            const value = structuredClone(publication);
+            if (scenario === "publications-ineligible") {
+              value.eligibility = "pending";
+              value.eligibility_reason =
+                "SINTÉTICO: duración no disponible en la consulta actual.";
+              value.duration = {
+                state: "unknown",
+                seconds: null,
+                reason: "No disponible.",
+              };
+              value.short_status = "undetermined";
+            }
+            send(request, response, 200, { data: value });
+            return;
+          }
+          if (scenario === "publications-paged-conflict" && secondPage) {
+            revision++;
+            send(request, response, 409, example("Error_VERSION_CONFLICT"));
+            return;
+          }
+          const paged = scenario.startsWith("publications-paged");
+          send(request, response, 200, {
+            items: paged
+              ? publicationItems.slice(secondPage ? 1 : 0, secondPage ? 2 : 1)
+              : publicationItems,
+            next_cursor:
+              paged && !secondPage ? "synthetic:publications:+/page2" : null,
+            snapshot_revision: revision,
+          });
+          return;
+        }
+        if (segments[5] === "analyses" && request.method === "GET") {
+          if (segments.length === 7) {
+            const selected = selectedAnalyses.find(
+              (item) => item.data.analysis_id === segments[6],
+            );
+            send(
+              request,
+              response,
+              selected ? 200 : 404,
+              selected ?? example("Error_NOT_FOUND"),
+            );
+            return;
+          }
+          const paged =
+            scenario === "publications-lost-paged" &&
+            selectedAnalyses.length > 1;
+          const items = (
+            paged
+              ? selectedAnalyses.slice(secondPage ? 1 : 0, secondPage ? 2 : 1)
+              : selectedAnalyses
+          ).map(({ data }) => ({
+            analysis_id: data.analysis_id,
+            analysis_version: data.analysis_version,
+            video_id: data.publication.video_id,
+            created_at: data.created_at,
+            audiovisual: data.audiovisual,
+          }));
+          send(request, response, 200, {
+            items,
+            next_cursor:
+              paged && !secondPage ? "synthetic:selections:+/page2" : null,
+            snapshot_revision: revision,
+          });
+          return;
+        }
+        if (segments[5] === "analyses" && request.method === "POST") {
+          const selected = selectedAnalyses.find(
+            (item) => item.data.publication.video_id === body.video_id,
+          );
+          if (selected) {
+            send(request, response, 200, selected);
+            return;
+          }
+          const attempts = requests.filter(
+            (item) => item.method === "POST" && item.path.endsWith("/analyses"),
+          );
+          if (
+            ["publications-retry", "publications-revision-changed"].includes(
+              scenario,
+            ) &&
+            attempts.length === 1
+          ) {
+            if (scenario === "publications-revision-changed") revision++;
+            send(request, response, 500, example("Error_INTERNAL_ERROR"));
+            return;
+          }
+          if (scenario === "publications-not-eligible") {
+            send(request, response, 422, example("Error_NOT_ELIGIBLE"));
+            return;
+          }
+          if (body.expected_run_revision !== revision) {
+            send(request, response, 409, example("Error_VERSION_CONFLICT"));
+            return;
+          }
+          const publication = publicationItems.find(
+            (item) => item.video_id === body.video_id,
+          );
+          if (!publication) {
+            send(request, response, 422, example("Error_NOT_ELIGIBLE"));
+            return;
+          }
+          const value = makeSelection(publication);
+          selectedAnalyses.push(value);
+          revision++;
+          if (
+            ["publications-lost", "publications-lost-paged"].includes(scenario)
+          ) {
+            request.socket.destroy();
+            return;
+          }
+          send(request, response, 201, value);
+          return;
+        }
       }
       if (segments[5] === "coverage" && request.method === "GET") {
         if (

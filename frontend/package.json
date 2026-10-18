@@ -21,6 +21,8 @@
     "test:e2e:runs": "playwright test --config playwright.runs.config.ts",
     "pretest:e2e:comparison": "node scripts/build-e2e.mjs",
     "test:e2e:comparison": "playwright test --config playwright.comparison.config.ts",
+    "pretest:e2e:publications": "node scripts/build-e2e.mjs",
+    "test:e2e:publications": "playwright test --config playwright.publications.config.ts",
     "security:client": "node scripts/check-client-boundary.mjs",
     "test:types": "node scripts/check-contract-types.mjs",
     "lint": "eslint .",
