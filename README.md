@@ -11,6 +11,66 @@ PASSWORD: pass_senialon
 
 URL: https://corefex-psi.vercel.app
 
+Detectamos la señal cuando apenas se enciende.
+
+## Acceso para jurados
+
+Abre [SENIALON — demo para evaluación](https://corefex-psi.vercel.app) en Chrome o Edge. Cuando el navegador solicite autenticación, introduce estas credenciales compartidas de demo:
+
+| Dato | Valor |
+| --- | --- |
+| Usuario | `senialon` |
+| Contraseña | `pass_senialon` |
+
+No hace falta una cuenta en JEV, Gemini, YouTube ni Vercel para acceder como jurado. Si aparece un error 401 o vuelve a pedir la contraseña, prueba una ventana de incógnito y escribe ambos valores exactamente como aparecen arriba. Si Vercel solicita iniciar sesión en su plataforma antes de mostrar la aplicación, el responsable del despliegue debe habilitar el acceso externo conservando la autenticación de SENIALON.
+
+### Configuración del despliegue
+
+Estas variables deben coincidir en los procesos de Next y FastAPI, en el entorno de producción de Vercel:
+
+```dotenv
+DEMO_USERNAME=senialon
+DEMO_PASSWORD=pass_senialon
+DEMO_ALLOWED_ORIGIN=https://corefex-psi.vercel.app
+PAID_CALLS_ENABLED=false
+```
+
+Después de cambiar variables en Vercel, generar un nuevo despliegue para aplicarlas. Editar este README no cambia la configuración del servidor. El enlace y las credenciales fueron proporcionados para la evaluación; su funcionamiento en producción aún debe comprobarse.
+
+`PAID_CALLS_ENABLED=false` mantiene bloqueadas las inferencias pagadas nuevas; las credenciales permiten acceder, pero no habilitan por sí solas un análisis nuevo. Las claves API de proveedores y la conexión a la base de datos se configuran como secretos del servidor y no se publican en este documento.
+
+Para ejecución local, usar `DEMO_ALLOWED_ORIGIN=http://127.0.0.1:3000` y configurar el mismo usuario y contraseña en ambos servicios. La sesión local que se inició antes de esta edición conserva su configuración anterior hasta reiniciarse con las variables nuevas.
+
+## Configuración de JEV y proveedores para el responsable técnico
+
+Configurar estas variables solo en el servicio backend de Vercel o en el archivo privado indicado explícitamente al arrancar. Los jurados no necesitan conocer las claves API. Los textos entre `<...>` son marcadores y deben sustituirse por valores reales en el servidor.
+
+```dotenv
+# JEV / TypeSafe
+TYPESAFE_API_KEY=<clave_privada_de_TypeSafe>
+JEV_MODEL=jev-latest
+
+# Proveedores y persistencia del recorrido integrado
+YOUTUBE_API_KEY=<clave_privada_de_YouTube>
+GEMINI_API_KEY=<clave_privada_de_Gemini>
+GEMINI_MODEL=<modelo_verificado_en_la_cuenta>
+DATABASE_URL=<conexion_privada_PostgreSQL>
+
+# Ejecución y control de gasto
+API_MODE=record
+PAID_CALLS_ENABLED=false
+BUDGET_USD=5
+JEV_RESERVATION_USD=
+GEMINI_RESERVATION_USD=
+PRICING_REFERENCE=
+AVAILABLE_BALANCE_USD=
+CONFIRMED_EXTERNAL_SPEND_USD=0
+PROVIDER_TIMEOUT_SECONDS=15
+```
+
+`BUDGET_USD=5` propone el tope operativo correspondiente a los USD 5 indicados por el usuario; no acredita saldo disponible. Antes de habilitar llamadas pagadas, verificar el saldo, los cargos externos y las tarifas aplicables, y completar `AVAILABLE_BALANCE_USD`, `CONFIRMED_EXTERNAL_SPEND_USD`, `PRICING_REFERENCE` y las reservas máximas por solicitud. No inventar reservas ni interpretar costos desconocidos como cero. Cambiar `PAID_CALLS_ENABLED` requiere completar el control de [presupuesto](docs/budget/README.md).
+
+`live` realiza llamadas sin añadir grabaciones reutilizables; `record` realiza llamadas y guarda respuestas en PostgreSQL. `replay` bloquea nuevas ejecuciones y envíos a proveedores; permite recuperar entregas ya persistidas, sin crear una demo ficticia ni clonar automáticamente una ejecución anterior. PostgreSQL puede ser externo: no son archivos de registro locales. La [plantilla completa](backend/.env.example) y la [guía backend](backend/README.md) describen la configuración.
 ## Identidad visual
 
 Los logos actuales están en `branding/`. Las variantes disponibles son:
