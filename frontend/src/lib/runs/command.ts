@@ -1,3 +1,6 @@
+import type { Schema } from "@/lib/api/types";
+import { isReviewRequest } from "@/lib/analysis/review";
+
 export const receiptStorageKey = "senialon:command:v1";
 export type CommandReceipt = {
   version: 1;
@@ -7,6 +10,15 @@ export type CommandReceipt = {
 } & (
   | { kind: "create" }
   | { kind: "advance"; runId: string; revision: number }
+  | {
+      kind: "record_review";
+      runId: string;
+      revision: number;
+      analysisId: string;
+      videoId: string;
+      reviewId: string;
+      request: Schema<"ReviewRequest">;
+    }
   | {
       kind: "advance_analysis";
       runId: string;
@@ -38,11 +50,12 @@ export type CommandReceipt = {
     }
 );
 
-// Only delivery metadata is stored. Run/results, credentials and budget remain
-// on the server. An unresolved receipt never expires into a new paid request.
+// Delivery metadata, plus the operator's exact pending review input, is stored.
+// Observations/results, credentials and budget remain on the server. A pending
+// attempt never expires into a new request; confirmed review input is removed.
 export function parseReceipt(text: string | null): CommandReceipt | null {
   if (text === null) return null;
-  if (text.length > 2048) throw new Error("Registro local no válido.");
+  if (text.length > 4_010_000) throw new Error("Registro local no válido.");
   const value: unknown = JSON.parse(text);
   if (
     !value ||
@@ -63,6 +76,8 @@ export function parseReceipt(text: string | null): CommandReceipt | null {
     !("kind" in value)
   )
     throw new Error("Registro local no válido.");
+  if (value.kind !== "record_review" && text.length > 2048)
+    throw new Error("Registro local no válido.");
   const base = {
     version: 1 as const,
     key: value.key,
@@ -74,6 +89,7 @@ export function parseReceipt(text: string | null): CommandReceipt | null {
   if (
     (value.kind === "advance" ||
       value.kind === "advance_analysis" ||
+      value.kind === "record_review" ||
       value.kind === "select_analysis" ||
       value.kind === "confirm_groups" ||
       value.kind === "compare") &&
@@ -86,6 +102,34 @@ export function parseReceipt(text: string | null): CommandReceipt | null {
     Number.isSafeInteger(value.revision) &&
     value.revision > 0
   ) {
+    if (
+      value.kind === "record_review" &&
+      Object.keys(value).length === 11 &&
+      value.operationId === null &&
+      "analysisId" in value &&
+      typeof value.analysisId === "string" &&
+      value.analysisId.length > 0 &&
+      value.analysisId.length <= 128 &&
+      "videoId" in value &&
+      typeof value.videoId === "string" &&
+      /^[A-Za-z0-9_-]{11}$/.test(value.videoId) &&
+      "reviewId" in value &&
+      typeof value.reviewId === "string" &&
+      value.reviewId.length > 0 &&
+      value.reviewId.length <= 128 &&
+      "request" in value &&
+      isReviewRequest(value.request)
+    )
+      return {
+        ...base,
+        kind: "record_review",
+        runId: value.runId,
+        revision: value.revision,
+        analysisId: value.analysisId,
+        videoId: value.videoId,
+        reviewId: value.reviewId,
+        request: value.request,
+      };
     if (
       value.kind === "advance_analysis" &&
       Object.keys(value).length === 10 &&

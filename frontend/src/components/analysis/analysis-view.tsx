@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { Schema } from "@/lib/api/types";
 import type { AnalysisSnapshot } from "@/lib/analysis/types";
 import {
@@ -85,9 +86,11 @@ function Suggestion({
 export function AnalysisView({
   snapshot,
   stale,
+  children,
 }: {
   snapshot: AnalysisSnapshot;
   stale: boolean;
+  children?: ReactNode;
 }) {
   const data = snapshot.response.data;
   const publication = data.publication;
@@ -147,6 +150,7 @@ export function AnalysisView({
             {label}
           </a>
         ))}
+        {children ? <a href="#revision-editorial">Revisión</a> : null}
       </nav>
 
       <section
@@ -429,6 +433,8 @@ export function AnalysisView({
       </section>
 
       <EvidenceCatalogue data={data} />
+
+      {children}
 
       <section className={styles.section} aria-labelledby="context-title">
         <h2 id="context-title">Contexto y procedencia</h2>

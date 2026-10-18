@@ -25,6 +25,7 @@ import { connectionNotice, type Notice, type Result } from "@/lib/runs/types";
 import { Feedback, OperationView } from "@/components/runs/run-detail";
 import shared from "@/components/runs/runs.module.css";
 import { AnalysisView } from "./analysis-view";
+import { EditorialReview } from "./editorial-review";
 import styles from "./analysis.module.css";
 
 type Receipt = Extract<CommandReceipt, { kind: "advance_analysis" }>;
@@ -61,6 +62,7 @@ export function AnalysisPanel({
 }) {
   const [snapshot, setSnapshot] = useState(initial.ok ? initial.value : null);
   const [stale, setStale] = useState(false);
+  const [reviewDirty, setReviewDirty] = useState(false);
   const [notice, setNotice] = useState<Notice | null>(
     initial.ok ? null : initial.error,
   );
@@ -82,6 +84,10 @@ export function AnalysisPanel({
     storage.receipt.analysisId === analysisId
       ? storage.receipt
       : null;
+  const pendingReview =
+    storage.receipt?.kind === "record_review" &&
+    storage.receipt.runId === runId &&
+    storage.receipt.analysisId === analysisId;
   const operation = inspectedOperation ? operations[inspectedOperation] : null;
   const retry =
     !pinned &&
@@ -98,6 +104,7 @@ export function AnalysisPanel({
     operation.budget.state === "allowed";
   const ready =
     !pinned &&
+    !reviewDirty &&
     !stale &&
     !busy &&
     storage.ready &&
@@ -366,11 +373,15 @@ export function AnalysisPanel({
           ? "Esta URL fija una versión de lectura. Abre la versión actual para continuar el análisis."
           : stale
             ? "Consulta el estado actual antes de solicitar otro paso."
-            : storage.receipt
-              ? "Hay una solicitud sin confirmar. Consulta su operación antes de continuar."
-              : snapshot?.run.budget.state !== "allowed"
-                ? "El gasto no está autorizado en el estado recibido. Puedes consultar los resultados disponibles."
-                : "Cada acción solicita una sola unidad de análisis y guarda su resultado. Abrir o consultar la ficha no solicita trabajo; no se garantiza que continúe al cerrar el navegador."}
+            : pendingReview
+              ? "Hay un guardado editorial sin confirmar. Usa Consultar revisión guardada antes de continuar."
+              : storage.receipt
+                ? "Hay una solicitud sin confirmar. Consulta su operación antes de continuar."
+                : reviewDirty
+                  ? "Hay un borrador editorial. Guárdalo o carga la revisión guardada antes de solicitar otro paso de análisis."
+                  : snapshot?.run.budget.state !== "allowed"
+                    ? "El gasto no está autorizado en el estado recibido. Puedes consultar los resultados disponibles."
+                    : "Cada acción solicita una sola unidad de análisis y guarda su resultado. Abrir o consultar la ficha no solicita trabajo; no se garantiza que continúe al cerrar el navegador."}
       </p>
       <div className={styles.links}>
         <Link
@@ -436,6 +447,14 @@ export function AnalysisPanel({
           Hay una solicitud de análisis pendiente de confirmar para esta pieza.
           Consulta la ficha y su operación; no se reenvía automáticamente.
         </p>
+      ) : pendingReview ? (
+        <p className={shared.warning}>
+          Hay una revisión editorial pendiente de confirmar para esta pieza.{" "}
+          <a href="#revision-editorial">
+            Consultar su estado y conservar el borrador
+          </a>
+          .
+        </p>
       ) : storage.receipt ? (
         <div className={shared.warning}>
           <p>
@@ -446,7 +465,8 @@ export function AnalysisPanel({
             <Link
               prefetch={false}
               href={
-                storage.receipt.kind === "advance_analysis"
+                storage.receipt.kind === "advance_analysis" ||
+                storage.receipt.kind === "record_review"
                   ? analysisPath(
                       storage.receipt.runId,
                       storage.receipt.analysisId,
@@ -498,7 +518,36 @@ export function AnalysisPanel({
         </section>
       ) : null}
       {snapshot ? (
-        <AnalysisView snapshot={snapshot} stale={stale} />
+        <AnalysisView snapshot={snapshot} stale={stale}>
+          <EditorialReview
+            snapshot={snapshot}
+            pinned={pinned}
+            stale={stale}
+            busy={!!busy}
+            perform={perform}
+            onSnapshot={(value) => {
+              setSnapshot(value);
+              setStale(false);
+            }}
+            onConfirmed={(review) => {
+              setSnapshot((current) =>
+                current &&
+                current.response.data.analysis_version ===
+                  review.analysis_version
+                  ? {
+                      ...current,
+                      response: {
+                        ...current.response,
+                        data: { ...current.response.data, review },
+                      },
+                    }
+                  : current,
+              );
+              setStale(true);
+            }}
+            onDraftChange={setReviewDirty}
+          />
+        </AnalysisView>
       ) : (
         <p className={styles.secondary}>
           No hay una ficha validada disponible en esta consulta. Puedes

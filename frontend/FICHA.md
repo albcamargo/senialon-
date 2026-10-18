@@ -34,7 +34,7 @@ El contexto y la procedencia permiten inspeccionar identidad, captura, versiones
 
 Las referencias internas llevan al registro de evidencia correspondiente. Los enlaces al video se construyen desde su identificador validado; las observaciones audiovisuales enlazan al segundo inicial en YouTube y muestran el intervalo recibido. El catálogo conserva la referencia original como texto, junto con la captura.
 
-La revisión distingue **Pendiente de revisión**, **Contrastada con el original**, **En disputa** e **Información insuficiente para verificar**, con la nota guardada cuando existe. La decisión editorial y la revisión de evidencia son de solo lectura en esta entrega; el formulario corresponde a FE 1.9.
+La revisión distingue **Pendiente de revisión**, **Contrastada con el original**, **En disputa** e **Información insuficiente para verificar**, con la nota guardada cuando existe. La entrega original FE 1.8 las presenta en lectura; la autorización posterior incorpora el [formulario FE 1.9](REVISION_EDITORIAL.md), con decisión, motivo y revisión de evidencia asociados a la versión exacta.
 
 Cada respuesta pasa las guardas de acceso y validación contractual en servidor, además de comprobaciones de ejecución, publicación elegible, ventanas, versión, señal, evidencia y revisión. Las referencias audiovisuales deben corresponder a su dimensión y quedar dentro del material procesado y de la duración conocida.
 
@@ -99,4 +99,4 @@ El contrato OpenAPI **1.0.0** conserva SHA-256 `d7e0b018263658e686da00997ddffbd1
 
 ## Alcance pendiente
 
-FE 1.8 conserva abierto su cierre integrado: falta comprobar las salidas de ALG 2.7–2.9 y las operaciones de BE 3.7/3.10/3.11 en el recorrido con proveedores, persistencia y URL protegida auténticos. La integración previa de JEV aporta código reutilizable, pero las pruebas sintéticas no acreditan cuentas, saldos ni servicios reales. FE 1.9 y la integración opcional con Notion permanecen fuera de esta entrega.
+FE 1.8 conserva abierto su cierre integrado: falta comprobar las salidas de ALG 2.7–2.9 y las operaciones de BE 3.7/3.10/3.11 en el recorrido con proveedores, persistencia y URL protegida auténticos. La integración previa de JEV aporta código reutilizable, pero las pruebas sintéticas no acreditan cuentas, saldos ni servicios reales. El registro editorial posterior está documentado en [FE 1.9](REVISION_EDITORIAL.md), con sus comprobaciones y pendientes propios. La integración opcional con Notion mantiene la última prioridad.

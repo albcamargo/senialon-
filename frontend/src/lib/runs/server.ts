@@ -22,6 +22,8 @@ type RunOperation = Extract<
   | "listAnalyses"
   | "getAnalysis"
   | "selectAnalysis"
+  | "getReview"
+  | "recordReview"
 >;
 type SuccessBody = {
   listRuns: Schema<"RunsResponse">;
@@ -38,6 +40,8 @@ type SuccessBody = {
   listAnalyses: Schema<"AnalysesResponse">;
   getAnalysis: Schema<"AnalysisResponse">;
   selectAnalysis: Schema<"AnalysisResponse">;
+  getReview: Schema<"ReviewResponse">;
+  recordReview: Schema<"ReviewResponse">;
 };
 
 export function resourceSegment(id: string): string {
@@ -90,7 +94,8 @@ export async function runRequest<Op extends RunOperation>(
       new Request(
         `https://senialon.invalid/api/v1/${pathname}${query ? `?${query}` : ""}`,
         {
-          method: mutation ? "POST" : "GET",
+          method:
+            operation === "recordReview" ? "PUT" : mutation ? "POST" : "GET",
           headers: forwarded,
           body: mutation ? JSON.stringify(options.body) : undefined,
         },
